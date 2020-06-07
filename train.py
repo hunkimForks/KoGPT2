@@ -1,16 +1,20 @@
-import torch
-from kogpt2.pytorch_kogpt2 import get_pytorch_kogpt2_model
+import mxnet as mx
+from kogpt2.mxnet_kogpt2 import get_mxnet_kogpt2_model
 from gluonnlp.data import SentencepieceTokenizer
 from kogpt2.utils import get_tokenizer
+
 
 import argparse
 import math
 import os
 from shutil import copy
 import time
-import subprocess
 
-#subprocess.check_call(['pip', 'install', '-r', 'requirements.txt'])
+
+if mx.context.num_gpus() > 0:
+  ctx = mx.gpu()
+else:
+  ctx = mx.cpu()
 
 parser = argparse.ArgumentParser(description='PyTorch KoGPT2')
 
@@ -54,7 +58,7 @@ args = parser.parse_args()
 
 print(args)
 
-model, vocab = get_pytorch_kogpt2_model(cachedir=args.model_dir)
+model, vocab = get_mxnet_kogpt2_model(ctx=ctx, cachedir=args.model_dir)
 print(model)
 print(vocab)
-print("DONE!")
+print("DONE")

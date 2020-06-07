@@ -3,9 +3,11 @@ import json
 import glob
 import time
     
-import torch
-from kogpt2.pytorch_kogpt2 import get_pytorch_kogpt2_model
+import mxnet as mx
+import gluonnlp as nlp
+
 from gluonnlp.data import SentencepieceTokenizer
+from kogpt2.model.gpt import GPT2Model as MXGPT2Model
 from kogpt2.utils import get_tokenizer
 
 def get_kogpt2_model(model_file,
@@ -31,13 +33,21 @@ def get_kogpt2_model(model_file,
 
 def model_fn(model_dir):    
     voc_file_name = glob.glob('{}/*.spiece'.format(model_dir))[0]
-    model_param_file_name = glob.glob('{}/*.params'.format(model_dir))[0]
+    model_param_file_name = glob.glob('{}/mxnet*.params'.format(model_dir))[0]
+
+    print(voc_file_name)
+    print(model_param_file_name)
     
+    # check if GPU is available
+    if mx.context.num_gpus() > 0:
+        ctx = mx.gpu()
+    else:
+        ctx = mx.cpu()
         
     model, vocab = get_kogpt2_model(model_param_file_name, voc_file_name, ctx)
     tok = SentencepieceTokenizer(voc_file_name)
     
-    return model, vocab, tok
+    return model, vocab, tok, ctx
 
 def transform_fn(model, request_body, content_type, accept_type):
     model, vocab, tok, ctx = model
@@ -62,3 +72,7 @@ def transform_fn(model, request_body, content_type, accept_type):
     response_body = json.dumps([sent, inference_count, time.time() - t0])
     
     return response_body, content_type
+
+if __name__ == "__main__":
+    m = model_fn("./cache")
+    print(transform_fn(m, "Hello", "", ""))

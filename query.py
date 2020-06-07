@@ -6,9 +6,10 @@ from kogpt2.utils import get_tokenizer
 tok_path = get_tokenizer()
 model, vocab = get_pytorch_kogpt2_model()
 tok = SentencepieceTokenizer(tok_path)
-sent = '2019년 한해를 보내며,'
+sent = '오늘의 출력'
 toked = tok(sent)
-while 1:
+count = 0
+while count < 100:
   input_ids = torch.tensor([vocab[vocab.bos_token],]  + vocab[toked]).unsqueeze(0)
   pred = model(input_ids)[0]
   gen = vocab.to_tokens(torch.argmax(pred, axis=-1).squeeze().tolist())[-1]
@@ -16,4 +17,6 @@ while 1:
       break
   sent += gen.replace('▁', ' ')
   toked = tok(sent)
-sent
+  count+=1
+
+print(sent)

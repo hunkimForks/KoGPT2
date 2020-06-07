@@ -8,6 +8,9 @@ import math
 import os
 from shutil import copy
 import time
+import subprocess
+
+#subprocess.check_call(['pip', 'install', '-r', 'requirements.txt'])
 
 parser = argparse.ArgumentParser(description='PyTorch KoGPT2')
 

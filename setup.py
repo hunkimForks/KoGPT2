@@ -7,6 +7,7 @@ setup(name='kogpt2',
       license='midified MIT',
       author='Heewon Jeon',
       author_email='madjakarta@gmail.com',
+      setup_requires=['mxnet', 'soynlp>=0.0.4'],
       description='KoGPT2 (Korean GPT-2)',
       packages=find_packages(where=".", exclude=(
           'tests',
